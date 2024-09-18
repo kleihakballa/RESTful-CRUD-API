@@ -1,138 +1,40 @@
 const express = require('express');
 const router = express.Router();
 
-const {Student} = require('../model/students');
+const authorRoutes = require('./authors');
+router.use('/authors', authorRoutes);
 
-// Retrieve data
-router.get('/api/students', async (req, res) => {
-    try {
-        const students = await Student.find();  
-        res.json(students);
-    } catch (error) {
-        console.error('Error fetching students:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+const bookRoutes = require('./books');
+router.use('/books', bookRoutes);
 
+const loansRoutes = require('./loans');
+router.use('/loans', loansRoutes);
 
+const memberRoutes = require('./members');
+router.use('/members', memberRoutes);
 
-router.get('/api/students/:id', async (req, res) => {
-    try {
+const transactionRouts = require('./transactions');
+router.use('/transactions', transactionRouts);
 
-        const student = await Student.findById(req.params.id);
-        
-        if (student) {
-            res.json(student);
-        } else {
-            res.status(404).send('Student not found');
-        }
-    } catch (error) {
-        console.error('Error retrieving student:', error); 
-        res.status(500).send('Server error');
-    }
-});
+const getBooksApi = require('./apiBooks');
+router.use('/apiBooks', getBooksApi);
 
-router.get('/api/students/name/:name', async (req, res) => {
-    try {
-        const student = await Student.findOne({ name: req.params.name });
-        
-        if (student) {
-            res.json(student);
-        } else {
-            res.status(404).send('Student not found');
-        }
-    } catch (error) {
-        console.error('Error retrieving student by name:', error);
-        res.status(500).send('Server error');
-    }
-});
+const loginRouter = require('./authroutes');
+router.use('/', loginRouter);
 
+const deleteComment =require('./books');
+router.use('/books', deleteComment);
 
-//Save data
-router.post('/api/students/add', async (req, res) => {
-    try {
-       
-        const stu = new Student({
-            name: req.body.name,
-            age: req.body.age 
-        });
+const postComment = require('./books');
+router.use('/books', postComment);
 
-        
-        const data = await stu.save(); 
+const getCommentsApi = require('./books');
+router.use('/books', getCommentsApi);
 
-       
-        res.status(200).json({
-            code: 200,
-            message: 'Student saved',
-            addStudent: data
-        });
-    } catch (error) {
-        console.error('Error saving student:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+const statsRouter = require('./stats');
+router.use('/stat', statsRouter);
 
-
-//Update data
-router.put("/api/students/edit/:id", async (req, res) => {
-    try {
-       
-        const stu = {
-            name: req.body.name,
-            age: req.body.age 
-        };
-
-        const student = await Student.findByIdAndUpdate(
-            req.params.id,        
-            { $set: stu },       
-            { new: true }         
-        );
-
-        if (student) {
-            res.status(200).json({
-                code: 200,
-                message: 'Student Updated',
-                updateStudent: student
-            });
-        } else {
-            res.status(404).json({
-                code: 404,
-                message: 'Student not found'
-            });
-        }
-    } catch (err) {
-        console.error('Error updating student:', err);
-        res.status(500).json({
-            code: 500,
-            message: 'Server error'
-        });
-    }
-});
-
-
-//Delete data
-router.delete("/api/students/:id", async (req, res) => {
-    try {
-        const student = await Student.findByIdAndDelete(req.params.id);
-        if (student) {
-            res.status(200).json({
-                code: 200,
-                message: 'Student Deleted',
-                deleteStudent: student
-            });
-        } else {
-            res.status(404).json({
-                code: 404,
-                message: 'Student not found'
-            });
-        }
-    } catch (err) {
-        console.error('Error deleting student:', err);
-        res.status(500).json({
-            code: 500,
-            message: 'Server error'
-        });
-    }
-});
+const auth = require('./request');
+router.use('/auth', auth);
 
 module.exports = router;
